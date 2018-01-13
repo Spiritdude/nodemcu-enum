@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+# -- NodeMCU Enumerator
+#    written by Rene K. Mueller <spiritdude@gmail.com>
+#
+# License: MIT
+#
+# Description:
+#    nodemcu-enum enumerates /dev/ttyUSB* devices according their chipid:
+#        /dev/nodemcu/104182472 -> /dev/ttyUSB0
+#
+#    This way you can use `nodemcu-tool --port /dev/nodemcu/104182472 ...`
+#
+#    See also https://github.com/Spiritdude/nodemcu-enum
+#
+# History:
+# 2018/01/13: 0.0.1: first version
+
+my $d = `nodemcu-tool devices`;
+
+unlink </dev/nodemcu/*>;
+
+while($d=~s/(\/dev\/\S+)//) {
+   my $p = $1;
+   $_ = `nodemcu-tool --port '$p' run ""`;       # -- run empty code
+   my($id) = ($_=~/ChipID:\s+0x(\S+)/);
+   if($id) {
+      my $xid = "0x".$id;
+      $id = hex($id);
+      print "$p: /dev/nodemcu/$id or /dev/nodemcu/$xid\n";
+      symlink($p,"/dev/nodemcu/$id");
+      symlink($p,"/dev/nodemcu/$xid");
+   } else {
+      print "ERROR: $p: can't query chipid (e.g. exit `nodemcu terminal` session)\n";
+   }
+}
