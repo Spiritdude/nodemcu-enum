@@ -25,6 +25,12 @@ you likely have to enter your password so `sudo` can operate can create `/dev/no
 
 ## Usage
 
+Once after the boot of your machine:
+```
+% sudo nodemcu-enum
+nodemcu-enum: init of /dev/nodemcu done (as root), rerun as normal user now
+```
+and then as normal user: 
 ```
 % nodemcu-enum
 /dev/ttyUSB0: /dev/nodemcu/5127392 or /dev/nodemcu/0x4e3ce0

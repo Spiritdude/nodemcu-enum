@@ -17,6 +17,8 @@
 # 2018/01/14: 0.0.2: check if /dev/nodemcu/ actually exists
 # 2018/01/13: 0.0.1: first version
 
+$0 =~ s/.+\///;
+
 unless(-e "/dev/nodemcu") {        # -- after boot it might not exist
    if($> == 0) {                                 # -- we are root?
       mkdir "/dev/nodemcu";
