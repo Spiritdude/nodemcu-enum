@@ -3,10 +3,10 @@
 # -- NodeMCU Enumerator
 #    written by Rene K. Mueller <spiritdude@gmail.com>
 #
-# License: MIT
+# License: MIT License
 #
 # Description:
-#    nodemcu-enum enumerates /dev/ttyUSB* devices according their chipid:
+#    nodemcu-enum enumerates /dev/ttyUSB* devices according their chip id:
 #        /dev/nodemcu/104182472 -> /dev/ttyUSB0
 #
 #    This way you can use `nodemcu-tool --port /dev/nodemcu/104182472 ...`
@@ -14,15 +14,29 @@
 #    See also https://github.com/Spiritdude/nodemcu-enum
 #
 # History:
+# 2018/01/14: 0.0.2: check if /dev/nodemcu/ actually exists
 # 2018/01/13: 0.0.1: first version
+
+unless(-e "/dev/nodemcu") {        # -- after boot it might not exist
+   if($> == 0) {                                 # -- we are root?
+      mkdir "/dev/nodemcu";
+      `chgrp dialout /dev/nodemcu`;
+      `chmod g+rw /dev/nodemcu`;
+      print "$0: init of /dev/nodemcu done (as root), rerun as normal user now\n";
+      exit 0;
+   } else {
+      print "$0: ERROR: you must run $0 first as root (e.g. `sudo nodemcu-enum`) once (after boot), then again as normal user\n";
+      exit 0;
+   }
+}
 
 my $d = `nodemcu-tool devices`;
 
-unlink </dev/nodemcu/*>;
+unlink </dev/nodemcu/*>;                        # -- remove all links (they might otherwise point to outdated /dev/ttyUSB*)
 
 while($d=~s/(\/dev\/\S+)//) {
    my $p = $1;
-   $_ = `nodemcu-tool --port '$p' run ""`;       # -- run empty code
+   $_ = `nodemcu-tool --port '$p' run ""`;      # -- run empty code just to pick up chip id
    my($id) = ($_=~/ChipID:\s+0x(\S+)/);
    if($id) {
       my $xid = "0x".$id;
@@ -31,6 +45,8 @@ while($d=~s/(\/dev\/\S+)//) {
       symlink($p,"/dev/nodemcu/$id");
       symlink($p,"/dev/nodemcu/$xid");
    } else {
-      print "ERROR: $p: can't query chipid (e.g. exit `nodemcu terminal` session)\n";
+      print "ERROR: $p: can't query chip id (e.g. exit `nodemcu terminal` session) or run nodemcu-enum once again\n";
    }
 }
+
+
