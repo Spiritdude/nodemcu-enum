@@ -1,6 +1,8 @@
 # NodeMCU Enumerator
 
-Enumerates multiple ESP8266 / NodeMCU devices according their chipid, e.g. `/dev/nodemcu/5127392` or `/dev/nodemcu/0x4e3ce0` so you can address them easily, and no longer with the ever changing `/dev/ttyUSBx`.
+Enumerates multiple ESP8266 & ESP32 / NodeMCU devices according their chipid, e.g. `/dev/nodemcu/5127392` or `/dev/nodemcu/0x4e3ce0` so you can address them easily, and no longer with the ever changing `/dev/ttyUSBx`.
+
+**NOTE:** If you want a more universal enumerator, consider [ESP Enumerator](https://github.com/Spiritdude/esp-enum) which probes general ESP8266 and ESP32 regardless of the firmware like NodeMCU.
 
 ## Requirements
 
